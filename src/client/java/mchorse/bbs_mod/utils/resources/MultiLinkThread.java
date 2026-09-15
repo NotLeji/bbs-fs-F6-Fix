@@ -6,14 +6,22 @@ import mchorse.bbs_mod.graphics.texture.Texture;
 import net.minecraft.client.MinecraftClient;
 
 import java.io.IOException;
-import java.util.Stack;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class MultiLinkThread implements Runnable
+public class MultiLinkThread
 {
-    private static MultiLinkThread instance;
-    private static Thread thread;
+    private static ExecutorService executor;
 
-    public Stack<MultiLink> links = new Stack<>();
+    private static synchronized ExecutorService getExecutor()
+    {
+        if (executor == null)
+        {
+            executor = Executors.newFixedThreadPool(Math.max(1, Runtime.getRuntime().availableProcessors() - 1));
+        }
+
+        return executor;
+    }
 
     /**
      * Get stream for multi resource location
@@ -46,52 +54,12 @@ public class MultiLinkThread implements Runnable
         }
     }
 
-    public static synchronized void add(MultiLink location)
+    public static void add(MultiLink location)
     {
-        if (instance != null && !thread.isAlive())
+        getExecutor().submit(() ->
         {
-            instance = null;
-        }
-
-        if (instance == null)
-        {
-            instance = new MultiLinkThread();
-            instance.addLink(location);
-            thread = new Thread(instance);
-            thread.start();
-        }
-        else
-        {
-            instance.addLink(location);
-        }
-    }
-
-    public static void clear()
-    {
-        instance = null;
-    }
-
-    public synchronized void addLink(MultiLink link)
-    {
-        if (this.links.contains(link))
-        {
-            return;
-        }
-
-        this.links.add(link);
-    }
-
-    @Override
-    public void run()
-    {
-        while (!this.links.isEmpty() && instance != null)
-        {
-            MultiLink location = this.links.peek();
-
             try
             {
-                this.links.pop();
-
                 Pixels pixels = TextureProcessor.process(location);
 
                 MinecraftClient.getInstance().execute(() ->
@@ -106,16 +74,20 @@ public class MultiLinkThread implements Runnable
                         newTexture.generateMipmap();
                     }
                 });
-
-                Thread.sleep(100);
             }
             catch (Exception e)
             {
                 e.printStackTrace();
             }
-        }
+        });
+    }
 
-        instance = null;
-        thread = null;
+    public static synchronized void clear()
+    {
+        if (executor != null)
+        {
+            executor.shutdownNow();
+            executor = null;
+        }
     }
 }

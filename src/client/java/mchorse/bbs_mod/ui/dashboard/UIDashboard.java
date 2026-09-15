@@ -41,6 +41,7 @@ import mchorse.bbs_mod.ui.utils.icons.Icons;
 import mchorse.bbs_mod.utils.Direction;
 import mchorse.bbs_mod.utils.MathUtils;
 import mchorse.bbs_mod.utils.colors.Colors;
+import mchorse.bbs_mod.utils.iris.IrisUtils;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
@@ -134,6 +135,10 @@ public class UIDashboard extends UIBaseMenu
 
             BBSSettings.ikDebug.enabled.set(enabled);
             BBSSettings.physicsDebug.enabled.set(enabled);
+        }).category(category);
+        this.overlay.keys().register(Keys.TOGGLE_SHADERS, () ->
+        {
+            IrisUtils.toggleShaders();
         }).category(category);
         this.overlay.keys().register(Keys.OPEN_SETTINGS, () ->
         {

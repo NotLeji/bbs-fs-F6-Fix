@@ -29,6 +29,8 @@ import net.irisshaders.iris.vertices.IrisExtendedBufferBuilder;
 import net.irisshaders.iris.vertices.NormI8;
 import net.irisshaders.iris.vertices.NormalHelper;
 import net.irisshaders.iris.vertices.views.TriView;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 
 import java.util.ArrayList;
@@ -177,6 +179,30 @@ public class IrisUtils
     public static boolean isShaderPackEnabled()
     {
         return IrisApi.getInstance().isShaderPackInUse();
+    }
+
+    /**
+     * Toggle shaders on/off, replicating the Iris toggle keybind (see Iris.handleKeybinds).
+     * Silent no-op when Iris is not installed, so the BBS UI keybind stays harmless there.
+     */
+    public static void toggleShaders()
+    {
+        /* Iris is compileOnly: never touch its classes unless the mod is present */
+        if (!FabricLoader.getInstance().isModLoaded("iris"))
+        {
+            return;
+        }
+
+        try
+        {
+            boolean enabled = !Iris.getIrisConfig().areShadersEnabled();
+
+            Iris.toggleShaders(MinecraftClient.getInstance(), enabled);
+        }
+        catch (Throwable e)
+        {
+            /* Intentionally silent: a failed toggle must never break the editor */
+        }
     }
 
     public static void setMainBound(boolean bound)

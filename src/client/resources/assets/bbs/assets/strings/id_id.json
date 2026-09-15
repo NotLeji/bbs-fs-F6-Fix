@@ -292,6 +292,7 @@
     "bbs.ui.copy": "Salin",
     "bbs.ui.dashboard.category": "Dasbor",
     "bbs.ui.dashboard.context.toggle_visibility": "Aktifkan/nonaktifkan visibilitas dasbor",
+    "bbs.ui.dashboard.keys.toggle_shaders": "Aktifkan/nonaktifkan shader Iris",
     "bbs.ui.dupe": "Duplikat",
     "bbs.ui.edit": "Edit",
     "bbs.ui.error": "Kesalahan",
